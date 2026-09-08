@@ -7,6 +7,8 @@ import static org.mockito.BDDMockito.then;
 
 import com.roommade.domain.user.code.UserErrorCode;
 import com.roommade.domain.user.dto.request.UserSignupRequest;
+import com.roommade.domain.user.dto.request.UserLoginRequest;
+import com.roommade.domain.user.dto.response.UserLoginSourceResponse;
 import com.roommade.domain.user.dto.response.UserSignupResponse;
 import com.roommade.domain.user.mapper.UserMapper;
 import com.roommade.global.exception.BusinessException;
@@ -63,6 +65,43 @@ class UserServiceImplTest {
 
         then(userMapper).should().existsByEmail(request.getEmail());
         then(userMapper).shouldHaveNoMoreInteractions();
+        then(passwordEncoder).shouldHaveNoInteractions();
+    }
+
+    @Test
+    void logsInWhenEmailAndPasswordMatch() {
+        UserLoginRequest request = new UserLoginRequest("member@roommade.com", "password123");
+        UserLoginSourceResponse user = new UserLoginSourceResponse(7L, request.getEmail(), "hashed-password");
+        given(userMapper.findLoginUserByEmail(request.getEmail())).willReturn(user);
+        given(passwordEncoder.matches(request.getPassword(), user.getPasswordHash())).willReturn(true);
+
+        assertThat(userService.login(request).getUserId()).isEqualTo(7L);
+        then(passwordEncoder).should().matches(request.getPassword(), user.getPasswordHash());
+    }
+
+    @Test
+    void rejectsLoginWhenPasswordDoesNotMatch() {
+        UserLoginRequest request = new UserLoginRequest("member@roommade.com", "wrong-password");
+        UserLoginSourceResponse user = new UserLoginSourceResponse(7L, request.getEmail(), "hashed-password");
+        given(userMapper.findLoginUserByEmail(request.getEmail())).willReturn(user);
+        given(passwordEncoder.matches(request.getPassword(), user.getPasswordHash())).willReturn(false);
+
+        assertThatThrownBy(() -> userService.login(request))
+                .isInstanceOf(BusinessException.class)
+                .extracting(exception -> ((BusinessException) exception).getErrorCode())
+                .isEqualTo(UserErrorCode.INVALID_CREDENTIALS);
+    }
+
+    @Test
+    void rejectsLoginWhenEmailDoesNotExist() {
+        UserLoginRequest request = new UserLoginRequest("unknown@roommade.com", "password123");
+        given(userMapper.findLoginUserByEmail(request.getEmail())).willReturn(null);
+
+        assertThatThrownBy(() -> userService.login(request))
+                .isInstanceOf(BusinessException.class)
+                .extracting(exception -> ((BusinessException) exception).getErrorCode())
+                .isEqualTo(UserErrorCode.INVALID_CREDENTIALS);
+
         then(passwordEncoder).shouldHaveNoInteractions();
     }
 

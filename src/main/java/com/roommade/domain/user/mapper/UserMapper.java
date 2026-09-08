@@ -1,6 +1,7 @@
 package com.roommade.domain.user.mapper;
 
 import com.roommade.domain.user.dto.request.UserSignupRequest;
+import com.roommade.domain.user.dto.response.UserLoginSourceResponse;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -18,4 +19,6 @@ public interface UserMapper {
     int insertIndependenceProgress(@Param("userId") Long userId);
 
     Long findIdByEmail(@Param("email") String email);
+
+    UserLoginSourceResponse findLoginUserByEmail(@Param("email") String email);
 }
