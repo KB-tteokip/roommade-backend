@@ -2,6 +2,9 @@ package com.roommade.domain.user.service;
 
 import com.roommade.domain.user.code.UserErrorCode;
 import com.roommade.domain.user.dto.request.UserSignupRequest;
+import com.roommade.domain.user.dto.request.UserLoginRequest;
+import com.roommade.domain.user.dto.response.UserLoginResponse;
+import com.roommade.domain.user.dto.response.UserLoginSourceResponse;
 import com.roommade.domain.user.dto.response.UserSignupResponse;
 import com.roommade.domain.user.mapper.UserMapper;
 import com.roommade.global.exception.BusinessException;
@@ -38,5 +41,15 @@ public class UserServiceImpl implements UserService {
         userMapper.insertIndependenceProgress(userId);
 
         return new UserSignupResponse(userId, request.getEmail());
+    }
+
+    @Override
+    public UserLoginResponse login(UserLoginRequest request) {
+        UserLoginSourceResponse user = userMapper.findLoginUserByEmail(request.getEmail());
+        if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
+            throw new BusinessException(UserErrorCode.INVALID_CREDENTIALS);
+        }
+
+        return new UserLoginResponse(user.getUserId(), user.getEmail());
     }
 }

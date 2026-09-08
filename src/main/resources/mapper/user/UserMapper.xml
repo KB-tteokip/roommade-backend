@@ -16,6 +16,13 @@
         WHERE email = #{email}
     </select>
 
+    <select id="findLoginUserByEmail"
+            resultType="com.roommade.domain.user.dto.response.UserLoginSourceResponse">
+        SELECT id, email, password_hash
+        FROM users
+        WHERE email = #{email}
+    </select>
+
     <insert id="insertProfile">
         INSERT INTO user_profiles (
             user_id, name, birth_date, monthly_income, workplace_road_address,
