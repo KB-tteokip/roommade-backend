@@ -6,13 +6,13 @@ import static org.mockito.BDDMockito.given;
 import com.roommade.domain.user.dto.request.UserLoginRequest;
 import com.roommade.domain.user.dto.response.UserLoginResponse;
 import com.roommade.domain.user.service.UserService;
-import javax.servlet.http.HttpSession;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpSession;
 
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
@@ -41,7 +41,8 @@ class UserControllerTest {
     @Test
     void invalidatesExistingSessionOnLogout() {
         MockHttpServletRequest httpRequest = new MockHttpServletRequest();
-        HttpSession session = httpRequest.getSession();
+        MockHttpSession session = new MockHttpSession();
+        httpRequest.setSession(session);
 
         userController.logout(httpRequest);
 
