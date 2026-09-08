@@ -31,6 +31,7 @@
 
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean" depends-on="flywayMigrator">
         <property name="dataSource" ref="dataSource"/>
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
         <property name="mapperLocations" value="classpath:mapper/**/*.xml"/>
     </bean>
 
@@ -45,6 +46,8 @@
     </bean>
 
     <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
 
     <context:component-scan base-package="com.roommade">
         <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
