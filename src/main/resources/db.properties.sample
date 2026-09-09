@@ -12,3 +12,6 @@ jdbc.driver=com.mysql.cj.jdbc.Driver
 jdbc.url=jdbc:mysql://localhost:3306/roommade?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
 jdbc.username=roommade
 jdbc.password=roommade1234
+
+# TMAP Open API (지오코딩 + 대중교통 경로, 매물 통근 시간 계산용)
+tmap.api.key=${TMAP_API_KEY:}
